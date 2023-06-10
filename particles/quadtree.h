@@ -1,5 +1,6 @@
 #include <vector>
 #include <memory>
+
 #include "particle.h"
 
 const int CAPACITY = 4;

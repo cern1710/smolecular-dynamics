@@ -1,6 +1,5 @@
 #include <iostream>
 
-#include <SDL2/SDL.h>
 #include "quadtree.h"
 
 const static float min = 1.0f;
