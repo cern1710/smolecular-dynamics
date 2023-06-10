@@ -15,14 +15,14 @@ public:
 
     bool contains(Particle* p) {
         return (p->position.x >= center.x - width &&
-                p->position.x < center.x + width &&
+                p->position.x <  center.x + width &&
                 p->position.y >= center.y - height &&
-                p->position.y < center.y + height);
+                p->position.y <  center.y + height);
     }
 
     bool intersects(Rectangle* range) {
-        return !(range->center.x - range->width > center.x + width ||
-                 range->center.x + range->width < center.x - width ||
+        return !(range->center.x - range->width  > center.x + width ||
+                 range->center.x + range->width  < center.x - width ||
                  range->center.y - range->height > center.y + height ||
                  range->center.y + range->height < center.y - height);
     }
@@ -56,7 +56,7 @@ public:
         if (SW->insert(p)) return true;
         if (SE->insert(p)) return true;
 
-        // If we can't insert the particle into any child, insert it into this node.
+        // if we can't insert the particle into any child, insert it into this node
         particles.push_back(p);
         return true;
     }
@@ -79,9 +79,9 @@ public:
 private:
     bool inBoundary(Particle* p) {
         return (p->position.x >= boundary.x - width &&
-                p->position.x < boundary.x + width &&
+                p->position.x <  boundary.x + width &&
                 p->position.y >= boundary.y - height &&
-                p->position.y < boundary.y + height);
+                p->position.y <  boundary.y + height);
     }
 
     void subdivide() {
@@ -97,16 +97,16 @@ private:
     }
 
     bool intersects(glm::vec2 range, float rangeWidth, float rangeHeight) {
-        return !(range.x - rangeWidth > boundary.x + width ||
-                 range.x + rangeWidth < boundary.x - width ||
+        return !(range.x - rangeWidth  > boundary.x + width ||
+                 range.x + rangeWidth  < boundary.x - width ||
                  range.y - rangeHeight > boundary.y + height ||
                  range.y + rangeHeight < boundary.y - height);
     }
 
     bool isInRange(Particle* p, glm::vec2 range, float rangeWidth, float rangeHeight) {
         return (p->position.x >= range.x - rangeWidth &&
-                p->position.x < range.x + rangeWidth &&
+                p->position.x <  range.x + rangeWidth &&
                 p->position.y >= range.y - rangeHeight &&
-                p->position.y < range.y + rangeHeight);
+                p->position.y <  range.y + rangeHeight);
     }
 };

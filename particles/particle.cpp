@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 
 #include <SDL2/SDL.h>
 #include "quadtree.h"
@@ -9,7 +8,7 @@ const static float max = 3.0f;
 
 int main(int argc, char* argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
-    SDL_Window* window = SDL_CreateWindow("Simulation of Particles Falling", SDL_WINDOWPOS_UNDEFINED,
+    SDL_Window* window = SDL_CreateWindow("Particle Simulation", SDL_WINDOWPOS_UNDEFINED,
                                             SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
@@ -26,7 +25,8 @@ int main(int argc, char* argv[]) {
     bool running = true;
     SDL_Event event;
     while (running) {
-        const Uint64 FRAME_TIME = SDL_GetPerformanceFrequency() / 60;  // 60 FPS
+        // record 60 fps
+        const Uint64 FRAME_TIME = SDL_GetPerformanceFrequency() / 60;
         Uint64 start = SDL_GetPerformanceCounter();
         while (SDL_PollEvent(&event))
             if (event.type == SDL_QUIT)
@@ -35,23 +35,22 @@ int main(int argc, char* argv[]) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(renderer);
 
-        // Create a Quadtree that covers the entire window.
+        // create quadtree to cover our window size
         Quadtree qt(glm::vec2(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2), WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
 
-        // Insert all particles into the Quadtree.
+        // insert all particles into quadtree
         for (auto& p : particles) {
             p.update();
             qt.insert(&p);
         }
 
-        // Check for collisions using the Quadtree to only check nearby particles.
+        // check for collisions using quadtree to check nearby particles
         for (auto& p : particles) {
             std::vector<Particle*> nearby;
             qt.queryRange(p.position, (max+1)*2, (max+1)*2, nearby);
             for (auto* other : nearby) {
-                if (&p != other) {
+                if (&p != other)
                     p.collide(*other);
-                }
             }
             p.render(renderer);
         }
@@ -60,9 +59,8 @@ int main(int argc, char* argv[]) {
         Uint64 end = SDL_GetPerformanceCounter();
         Uint64 elapsed = end - start;
 
-        if (elapsed < FRAME_TIME) {
+        if (elapsed < FRAME_TIME)
             SDL_Delay((FRAME_TIME - elapsed) * 1000 / SDL_GetPerformanceFrequency());
-        }
     }
 
     SDL_DestroyRenderer(renderer);
