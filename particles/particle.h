@@ -2,14 +2,14 @@
 
 const int WINDOW_WIDTH = 1080;
 const int WINDOW_HEIGHT = 720;
-const double GRAVITY = 0.005;
+const double GRAVITY = 0.25;
 
 struct Particle {
     glm::vec2 position;
     glm::vec2 velocity;
-    float radius = 4.0f;
+    float radius;
 
-    Particle(double x, double y, double vx, double vy) : position(x, y), velocity(vx, vy) {}
+    Particle(double x, double y, double vx, double vy, float r) : position(x, y), velocity(vx, vy), radius(r) {}
 
     void drawCircle(SDL_Renderer* renderer, int x_centre, int y_centre, int radius) {
         for (int w = 0; w < radius * 2; w++)
