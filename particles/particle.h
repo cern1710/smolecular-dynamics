@@ -7,7 +7,7 @@ const double GRAVITY = 0.01;
 struct Particle {
     glm::vec2 position;
     glm::vec2 velocity;
-    int radius = 3;
+    float radius = 3.0f;
 
     Particle(double x, double y, double vx, double vy) : position(x, y), velocity(vx, vy) {}
 
@@ -29,6 +29,15 @@ struct Particle {
         if (position.y > WINDOW_HEIGHT - radius) { // consider radius for bouncing back
             position.y = WINDOW_HEIGHT - radius;
             velocity.y *= -0.5;
+        }
+    }
+
+    void collide(Particle& other) {
+        glm::vec2 diff = position - other.position;
+        if (glm::length(diff) < radius + other.radius) {
+            glm::vec2 norm_diff = glm::normalize(diff);
+            position = other.position + (norm_diff * static_cast<float>(radius + other.radius));
+            velocity = glm::reflect(velocity, norm_diff);
         }
     }
 

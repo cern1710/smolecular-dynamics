@@ -11,7 +11,7 @@ int main(int argc, char* argv[]) {
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     std::vector<Particle> particles;
-    for(int i = 0; i < 2000; i++) {
+    for(int i = 0; i < 200; i++) {
         double x = (double)rand() / RAND_MAX * WINDOW_WIDTH;
         double y = (double)rand() / RAND_MAX * WINDOW_HEIGHT;
         double vx = (double)rand() / RAND_MAX * 2 - 1;
@@ -32,6 +32,11 @@ int main(int argc, char* argv[]) {
         for (auto& p : particles) {
             p.update();
             p.render(renderer);
+            for (auto& p2 : particles) {
+                if (&p != &p2) {
+                    p.collide(p2);
+                }
+            }
         }
 
         SDL_RenderPresent(renderer);
