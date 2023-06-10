@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This repo contains folders for basic molecular dynamics simulations. SML2 and C++ are required to run these programs.
+This repo contains folders for basic molecular dynamics simulations. SML2 and OpenGL are required to run these programs.
 
 ## Description
 
