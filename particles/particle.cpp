@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 
-#include "/opt/homebrew/include/SDL2/SDL.h"
+#include <SDL2/SDL.h>
 #include "particle.h"
 
 int main(int argc, char* argv[]) {

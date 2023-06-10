@@ -1,4 +1,4 @@
-#include "/opt/homebrew/include/SDL2/SDL.h"
+#include <SDL2/SDL.h>
 
 const int WINDOW_WIDTH = 1080;
 const int WINDOW_HEIGHT = 720;
