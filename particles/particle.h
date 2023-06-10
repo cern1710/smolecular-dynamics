@@ -2,7 +2,7 @@
 
 const int WINDOW_WIDTH = 1080;
 const int WINDOW_HEIGHT = 720;
-const double GRAVITY = 0.01;
+const double GRAVITY = 0.005;
 
 struct Particle {
     glm::vec2 position;
@@ -14,8 +14,8 @@ struct Particle {
     void drawCircle(SDL_Renderer* renderer, int x_centre, int y_centre, int radius) {
         for (int w = 0; w < radius * 2; w++)
             for (int h = 0; h < radius * 2; h++) {
-                int dx = radius - w;  // horizontal offset
-                int dy = radius - h;  // vertical offset
+                int dx = radius - w;
+                int dy = radius - h;
 
                 if ((dx*dx + dy*dy) <= (radius * radius))
                     SDL_RenderDrawPoint(renderer, x_centre + dx, y_centre + dy);
@@ -32,12 +32,29 @@ struct Particle {
         }
     }
 
+    // simplified collision; assumes perfectly elastic and two-particle
     void collide(Particle& other) {
         glm::vec2 diff = position - other.position;
         if (glm::length(diff) < radius + other.radius) {
-            glm::vec2 norm_diff = glm::normalize(diff);
-            position = other.position + (norm_diff * static_cast<float>(radius + other.radius));
-            velocity = glm::reflect(velocity, norm_diff);
+            float dist = glm::length(diff);
+            float total_radius = radius + other.radius;
+            glm::vec2 normal = diff / dist; // normalised collision vector (direction of collision)
+        
+            // Conservation of momentum (assumes collision occurs in one dimension) - mv
+            // Conservation of kinetic energy - mv^2/2
+            // p = amount of velocity to exchange between 2 particles
+            float p = 2.0f * (glm::dot(velocity, normal)-glm::dot(other.velocity, normal)) / total_radius;
+
+            // update velocities based on the momentum change
+            // distributes proportionally to the radii of particles
+            velocity = velocity - p * normal * other.radius;
+            other.velocity = other.velocity + p * normal * radius;
+
+            // resolve overlapping of particles
+            // particles are moved along normal by half the overlap distance
+            float overlap = 0.5f * (dist - total_radius);
+            position -= overlap * normal;
+            other.position += overlap * normal;
         }
     }
 

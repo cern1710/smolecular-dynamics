@@ -32,12 +32,11 @@ int main(int argc, char* argv[]) {
         for (auto& p : particles) {
             p.update();
             p.render(renderer);
-            for (auto& p2 : particles) {
-                if (&p != &p2) {
-                    p.collide(p2);
-                }
-            }
         }
+
+        for (size_t i = 0; i < particles.size(); i++)
+            for (size_t j = i + 1; j < particles.size(); j++)
+                particles[i].collide(particles[j]);
 
         SDL_RenderPresent(renderer);
         SDL_Delay(1);
