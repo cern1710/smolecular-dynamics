@@ -8,6 +8,8 @@ struct Particle {
     glm::vec2 position;
     glm::vec2 velocity;
     float radius;
+    const double friction = 0.01;
+    const double collision_loss = 0.03;
 
     Particle(double x, double y, double vx, double vy, float r) : position(x, y), velocity(vx, vy), radius(r) {}
 
@@ -25,14 +27,14 @@ struct Particle {
     void update() {
         position += velocity;
         velocity.y += GRAVITY;
-
+        velocity *= 1.0 - friction;
         if (position.y > WINDOW_HEIGHT - radius) { // consider radius for bouncing back
             position.y = WINDOW_HEIGHT - radius;
-            velocity.y *= -0.5;
+            velocity.y *= -(1.0 - collision_loss);
         }
     }
 
-    // simplified collision; assumes perfectly elastic and two-particle
+    // simplified collision; assumes two-particle
     void collide(Particle& other) {
         glm::vec2 diff = position - other.position;
         if (glm::length(diff) < radius + other.radius) {
@@ -49,13 +51,17 @@ struct Particle {
 
             // update velocities based on the momentum change
             // distributes proportionally to the particle mass
-            velocity = velocity - p * normal * other_mass;
-            other.velocity = other.velocity + p * normal * mass;
+            velocity       -= p * normal * other_mass;
+            other.velocity += p * normal * mass;
+
+            // inelastic collision by reducing speed
+            velocity       *= 1.0 - collision_loss;
+            other.velocity *= 1.0 - collision_loss;
 
             // resolve overlapping of particles along the collision normal
             // displacement is proportional to the particle mass
-            float overlap = 0.5f * (dist - (radius + other.radius));
-            position -= overlap * normal * (other_mass / total_mass);
+            float overlap   = 0.5f * (dist - (radius + other.radius));
+            position       -= overlap * normal * (other_mass / total_mass);
             other.position += overlap * normal * (mass / total_mass);
         }
     }
