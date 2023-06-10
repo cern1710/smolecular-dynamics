@@ -2,14 +2,14 @@
 
 const int WINDOW_WIDTH = 1080;
 const int WINDOW_HEIGHT = 720;
-const double GRAVITY = 0.25;
+const double GRAVITY = 0.2;
 
 struct Particle {
     glm::vec2 position;
     glm::vec2 velocity;
     float radius;
     const double friction = 0.01;
-    const double collision_loss = 0.03;
+    const double collision_loss = 0.05;
 
     Particle(double x, double y, double vx, double vy, float r) : position(x, y), velocity(vx, vy), radius(r) {}
 
