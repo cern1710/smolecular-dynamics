@@ -45,7 +45,6 @@ struct Particle {
             glm::vec2 normal = diff / dist; // normalised collision vector (direction of collision)
         
             // calculate momentum exchange along the collision normal
-            // assumes perfectly elastic collision (kinetic energy is conserved)
             // p = amount of velocity to exchange between 2 particles
             float p = 2.0f * (glm::dot(velocity, normal)-glm::dot(other.velocity, normal)) / total_mass;
 
