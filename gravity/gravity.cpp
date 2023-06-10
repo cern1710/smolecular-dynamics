@@ -2,7 +2,7 @@
 #include <vector>
 
 #include "/opt/homebrew/include/SDL2/SDL.h"
-#include "gravity.h"
+#include "particle.h"
 
 int main(int argc, char* argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
@@ -11,7 +11,7 @@ int main(int argc, char* argv[]) {
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     std::vector<Particle> particles;
-    for(int i = 0; i < 1000; i++) {
+    for(int i = 0; i < 2000; i++) {
         double x = (double)rand() / RAND_MAX * WINDOW_WIDTH;
         double y = (double)rand() / RAND_MAX * WINDOW_HEIGHT;
         double vx = (double)rand() / RAND_MAX * 2 - 1;

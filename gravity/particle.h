@@ -1,8 +1,8 @@
 #include "/opt/homebrew/include/SDL2/SDL.h"
 
-const int WINDOW_WIDTH = 800;
-const int WINDOW_HEIGHT = 600;
-const double GRAVITY = 0.5;
+const int WINDOW_WIDTH = 1080;
+const int WINDOW_HEIGHT = 720;
+const double GRAVITY = 0.01;
 
 struct Particle {
     double x, y;
@@ -26,7 +26,7 @@ struct Particle {
         y += vy;
         vy += GRAVITY; // gravity effect
 
-        if (y > WINDOW_HEIGHT - radius) { // consider the radius for bouncing back
+        if (y > WINDOW_HEIGHT - radius) { // consider radius for bouncing back
             y = WINDOW_HEIGHT - radius;
             vy *= -0.5;
         }
