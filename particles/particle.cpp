@@ -23,6 +23,7 @@ int main(int argc, char* argv[]) {
     bool running = true;
     SDL_Event event;
     while (running) {
+        Uint64 start = SDL_GetPerformanceCounter();
         while (SDL_PollEvent(&event))
             if (event.type == SDL_QUIT)
                 running = false;
@@ -34,13 +35,14 @@ int main(int argc, char* argv[]) {
             p.update();
             p.render(renderer);
         }
-
         for (size_t i = 0; i < particles.size(); i++)
             for (size_t j = i + 1; j < particles.size(); j++)
                 particles[i].collide(particles[j]);
 
         SDL_RenderPresent(renderer);
-        SDL_Delay(1);
+        Uint64 end = SDL_GetPerformanceCounter();
+        float elapsedMS = (end - start) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
+        SDL_Delay(floor(16.666f - elapsedMS)); // cap to 60 fps
     }
 
     SDL_DestroyRenderer(renderer);
