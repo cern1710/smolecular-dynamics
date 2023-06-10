@@ -2,7 +2,10 @@
 #include <vector>
 
 #include <SDL2/SDL.h>
-#include "particle.h"
+#include "quadtree.h"
+
+const static float min = 1.0f;
+const static float max = 3.0f;
 
 int main(int argc, char* argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
@@ -11,18 +14,19 @@ int main(int argc, char* argv[]) {
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     std::vector<Particle> particles;
-    for(int i = 0; i < 1000; i++) {
+    for(int i = 0; i < 4000; i++) {
         double x = (double)rand() / RAND_MAX * WINDOW_WIDTH;
         double y = (double)rand() / RAND_MAX * WINDOW_HEIGHT;
         double vx = (double)rand() / RAND_MAX * 2 - 1;
         double vy = (double)rand() / RAND_MAX * 2 - 1;
-        float radius = (float)rand() / RAND_MAX * 5.0f + 2.0f;
+        float radius = (float)rand() / RAND_MAX * max + min;
         particles.push_back(Particle(x, y, vx, vy, radius));
     }
 
     bool running = true;
     SDL_Event event;
     while (running) {
+        const Uint64 FRAME_TIME = SDL_GetPerformanceFrequency() / 60;  // 60 FPS
         Uint64 start = SDL_GetPerformanceCounter();
         while (SDL_PollEvent(&event))
             if (event.type == SDL_QUIT)
@@ -31,18 +35,34 @@ int main(int argc, char* argv[]) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(renderer);
 
+        // Create a Quadtree that covers the entire window.
+        Quadtree qt(glm::vec2(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2), WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
+
+        // Insert all particles into the Quadtree.
         for (auto& p : particles) {
             p.update();
+            qt.insert(&p);
+        }
+
+        // Check for collisions using the Quadtree to only check nearby particles.
+        for (auto& p : particles) {
+            std::vector<Particle*> nearby;
+            qt.queryRange(p.position, (max+1)*2, (max+1)*2, nearby);
+            for (auto* other : nearby) {
+                if (&p != other) {
+                    p.collide(*other);
+                }
+            }
             p.render(renderer);
         }
-        for (size_t i = 0; i < particles.size(); i++)
-            for (size_t j = i + 1; j < particles.size(); j++)
-                particles[i].collide(particles[j]);
 
         SDL_RenderPresent(renderer);
         Uint64 end = SDL_GetPerformanceCounter();
-        float elapsedMS = (end - start) / (float)SDL_GetPerformanceFrequency() * 1000.0f;
-        SDL_Delay(floor(16.666f - elapsedMS)); // cap to 60 fps
+        Uint64 elapsed = end - start;
+
+        if (elapsed < FRAME_TIME) {
+            SDL_Delay((FRAME_TIME - elapsed) * 1000 / SDL_GetPerformanceFrequency());
+        }
     }
 
     SDL_DestroyRenderer(renderer);

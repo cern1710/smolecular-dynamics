@@ -1,8 +1,9 @@
 #include <glm/glm.hpp>
+#include <SDL2/SDL.h>
 
 const int WINDOW_WIDTH = 1080;
 const int WINDOW_HEIGHT = 720;
-const double GRAVITY = 0.2;
+const double GRAVITY = 0.1;
 
 struct Particle {
     glm::vec2 position;
@@ -10,6 +11,7 @@ struct Particle {
     float radius;
     const double friction = 0.01;
     const double collision_loss = 0.05;
+    const double drag_coeff = 0.005;
 
     Particle(double x, double y, double vx, double vy, float r) : position(x, y), velocity(vx, vy), radius(r) {}
 
@@ -27,7 +29,7 @@ struct Particle {
     void update() {
         position += velocity;
         velocity.y += GRAVITY;
-        velocity *= 1.0 - friction;
+        velocity *= (1.0 - friction) * (1.0 - drag_coeff);
         if (position.y > WINDOW_HEIGHT - radius) { // consider radius for bouncing back
             position.y = WINDOW_HEIGHT - radius;
             velocity.y *= -(1.0 - collision_loss);
@@ -60,6 +62,8 @@ struct Particle {
             // resolve overlapping of particles along the collision normal
             // displacement is proportional to the particle mass
             float overlap   = 0.5f * (dist - (radius + other.radius));
+            float buffer = 1.0f;
+            overlap -= buffer;
             position       -= overlap * normal * (other_mass / total_mass);
             other.position += overlap * normal * (mass / total_mass);
         }
