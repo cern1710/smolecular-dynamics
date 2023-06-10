@@ -7,7 +7,7 @@ const double GRAVITY = 0.005;
 struct Particle {
     glm::vec2 position;
     glm::vec2 velocity;
-    float radius = 3.0f;
+    float radius = 4.0f;
 
     Particle(double x, double y, double vx, double vy) : position(x, y), velocity(vx, vy) {}
 
@@ -37,24 +37,26 @@ struct Particle {
         glm::vec2 diff = position - other.position;
         if (glm::length(diff) < radius + other.radius) {
             float dist = glm::length(diff);
-            float total_radius = radius + other.radius;
+            float mass = radius * radius;
+            float other_mass = other.radius * other.radius;
+            float total_mass = mass + other_mass;
             glm::vec2 normal = diff / dist; // normalised collision vector (direction of collision)
         
-            // Conservation of momentum (assumes collision occurs in one dimension) - mv
-            // Conservation of kinetic energy - mv^2/2
+            // calculate momentum exchange along the collision normal
+            // assumes perfectly elastic collision (kinetic energy is conserved)
             // p = amount of velocity to exchange between 2 particles
-            float p = 2.0f * (glm::dot(velocity, normal)-glm::dot(other.velocity, normal)) / total_radius;
+            float p = 2.0f * (glm::dot(velocity, normal)-glm::dot(other.velocity, normal)) / total_mass;
 
             // update velocities based on the momentum change
-            // distributes proportionally to the radii of particles
-            velocity = velocity - p * normal * other.radius;
-            other.velocity = other.velocity + p * normal * radius;
+            // distributes proportionally to the particle mass
+            velocity = velocity - p * normal * other_mass;
+            other.velocity = other.velocity + p * normal * mass;
 
-            // resolve overlapping of particles
-            // particles are moved along normal by half the overlap distance
-            float overlap = 0.5f * (dist - total_radius);
-            position -= overlap * normal;
-            other.position += overlap * normal;
+            // resolve overlapping of particles along the collision normal
+            // displacement is proportional to the particle mass
+            float overlap = 0.5f * (dist - (radius + other.radius));
+            position -= overlap * normal * (other_mass / total_mass);
+            other.position += overlap * normal * (mass / total_mass);
         }
     }
 
